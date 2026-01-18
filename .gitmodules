@@ -1,0 +1,6 @@
+[submodule "erdos107"]
+	path = erdos107
+	url = https://github.com/BrettRey/erdos107.git
+[submodule "EmptyHexagonLean"]
+	path = EmptyHexagonLean
+	url = https://github.com/bsubercaseaux/EmptyHexagonLean.git
