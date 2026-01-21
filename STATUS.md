@@ -1,7 +1,7 @@
 # STATUS.md - Erdős Problem #107
 
-**Last updated:** 2026-01-14
-**Current phase:** CEGIS + Lean proof scaffolding (paused)
+**Last updated:** 2026-01-21
+**Current phase:** Verified signotope LRAT proof (UNSAT)
 
 ## Chat Links
 
@@ -13,10 +13,23 @@ Prove ES(6) = 17 via verified SAT: show no 16-point configuration in general pos
 
 ## Current State
 
-### SAT/CEGIS Pipeline
+### BREAKTHROUGH: Signotope Approach Verified (2026-01-21)
+
+**Key correction:** CaDiCaL exit code 20 = UNSAT (not SAT as previously misread).
+
+**Result:** The signotope/CC encoding (GP3+CC+full-triangles) is UNSAT on the 17-point instance, with a verified LRAT proof.
+
+**Artifacts:**
+- CNF: `/tmp/sig_6_17_gp3_cc_full.cnf`
+- LRAT: `/tmp/sig_6_17_gp3_cc_full.lrat` (~952 MB)
+- Checker log: `erdos107/logs/sig_6_17_gp3_cc_full_lrat_check.log` (VERIFIED UNSAT)
+
+**OM3 backup:** Stopped (no longer needed).
+
+### Previous SAT/CEGIS Pipeline (superseded)
 - **N=16 case:** Found valid counterexample (verified) - 16 points CAN avoid convex 6-gon
 - **N=17 case:** CEGIS loop iterated through ~10,000+ of 12,376 six-subsets
-- **Status:** Paused after >16h runtime; remaining subsets are "in the tail" (harder to saturate)
+- **Status:** Superseded by signotope approach
 - **Latest state:** `erdos107/state_6_17_work.json` (32MB)
 
 ### Lean Formalization
@@ -67,3 +80,12 @@ Prove ES(6) = 17 via verified SAT: show no 16-point configuration in general pos
 
 ### 2026-01-14
 - STATUS.md updated to reflect actual progress
+
+### 2026-01-20
+- **BREAKTHROUGH:** Corrected CaDiCaL exit code interpretation (20 = UNSAT, not SAT)
+- All signotope scouts (GP3-only, GP3+CC, GP3+CC+full-triangles) confirmed UNSAT
+- Signotope/CC encoding sufficient to refute 17-point "no convex 6-gon" instance
+
+### 2026-01-21
+- LRAT proof generated and verified (cake_lpr: VERIFIED UNSAT)
+- OM3 proof run stopped
