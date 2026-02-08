@@ -1,7 +1,7 @@
 # STATUS.md - Erdős Problem #107
 
-**Last updated:** 2026-01-21
-**Current phase:** Verified signotope LRAT proof (UNSAT)
+**Last updated:** 2026-02-08
+**Current phase:** Write-up and bridge formalization
 
 ## Chat Links
 
@@ -9,55 +9,66 @@
 
 ## Goal
 
-Prove ES(6) = 17 via verified SAT: show no 16-point configuration in general position avoids a convex 6-gon.
+Prove ES(6) = 17 via verified SAT: show no 17-point configuration in general position avoids a convex 6-gon.
 
 ## Current State
 
-### BREAKTHROUGH: Signotope Approach Verified (2026-01-21)
+### Compute: Done
 
-**Key correction:** CaDiCaL exit code 20 = UNSAT (not SAT as previously misread).
+The signotope/CC encoding (GP3+CC+full-triangles) is UNSAT on the 17-point instance, with a verified LRAT proof.
 
-**Result:** The signotope/CC encoding (GP3+CC+full-triangles) is UNSAT on the 17-point instance, with a verified LRAT proof.
+**Artifacts (archived):**
+- CNF: `artifacts/signotope-6-17/sig_6_17_gp3_cc_full.cnf`
+- LRAT: `artifacts/signotope-6-17/sig_6_17_gp3_cc_full.lrat` (~952 MB)
+- Checker output: VERIFIED UNSAT (cake_lpr)
 
-**Artifacts:**
-- CNF: `/tmp/sig_6_17_gp3_cc_full.cnf`
-- LRAT: `/tmp/sig_6_17_gp3_cc_full.lrat` (~952 MB)
-- Checker log: `erdos107/logs/sig_6_17_gp3_cc_full_lrat_check.log` (VERIFIED UNSAT)
+**Lower bound:** 16-point counterexample found and verified (N=16 CAN avoid convex 6-gon).
 
-**OM3 backup:** Stopped (no longer needed).
+### Lean SAT Spec: Soundness Complete
 
-### Previous SAT/CEGIS Pipeline (superseded)
-- **N=16 case:** Found valid counterexample (verified) - 16 points CAN avoid convex 6-gon
-- **N=17 case:** CEGIS loop iterated through ~10,000+ of 12,376 six-subsets
-- **Status:** Superseded by signotope approach
-- **Latest state:** `erdos107/state_6_17_work.json` (32MB)
-
-### Lean Formalization
-- Core definitions complete (GeneralPosition, ConvexPosition, ES(n))
+- Core definitions: GeneralPosition, ConvexPosition, ES(n)
 - SAT spec with explicit literals (`Lit.pos`/`Lit.neg`)
-- **Proved:** swap/cycle/acyclic clause soundness
-- **Stubbed:** GPRel soundness, avoidClause soundness, full satSpecCNF soundness
+- All clause-family soundness proved: swap, cycle, acyclic, GPRel, avoidClause
+- `satSpecCNF_sound` proved (no `sorry` stubs in SATCNF.lean)
+- DIMACS emitter (`EmitCNF.lean`) and `emit_cnf` executable working
 - Build passes: `lake build Erdos107.SATCNF` (warnings only)
+
+### Lean Bridge: Incomplete
+
+`Bridge.lean` has stubs. Needs:
+1. General position implies chirotope axioms
+2. Convex hexagon implies forbidden 6-point pattern
+
+### Write-Up: Not Started
+
+Encoding correctness documentation (soundness argument for signotope+GP3+CC+full-triangles) needed for publishability.
 
 ## Progress
 
 - [x] Lean 4 installed via elan
 - [x] Fresh mathlib project created (`erdos107/`)
-- [x] Core definitions formalized
+- [x] Core definitions formalized (GeneralPosition, ConvexPosition, ES(n))
 - [x] CEGIS Python pipeline built (encode_om3.py, cegis_sat_loop.py, verify_no_alternating.py)
 - [x] N=16 counterexample found and verified
-- [x] N=17 CEGIS iterations (partial saturation)
+- [x] Signotope encoding: N=17 UNSAT confirmed
+- [x] LRAT proof generated and verified (cake_lpr)
 - [x] Lean SAT spec with clause generators
 - [x] Swap/cycle/acyclic soundness proved
-- [ ] GPRel/avoidance soundness
-- [ ] Full satSpec soundness theorem
-- [ ] N=17 UNSAT (or full saturation)
+- [x] GPRel soundness proved
+- [x] avoidClause soundness proved
+- [x] Full satSpecCNF soundness theorem proved
+- [x] DIMACS emitter and check_unsat.sh script
+- [ ] Bridge.lean: general position implies chirotope axioms
+- [ ] Bridge.lean: convex hexagon implies forbidden pattern
+- [ ] Package UNSAT result as replayable Lean theorem (CNF + certificate)
+- [ ] Formalize 16-point witness in Lean (lower bound)
+- [ ] Write-up: encoding correctness documentation
 
-## Open Questions
+## Previous SAT/CEGIS Pipeline (superseded)
 
-- Resume CEGIS with better heuristics, or wait for Lean proofs to mature?
-- Is the "tail" fundamentally hard, or is there a smarter subset ordering?
-- Could parallel SAT solving help?
+The iterative CEGIS approach reached ~10,000+ of 12,376 six-subsets for N=17 before being superseded by the signotope encoding, which solved the problem in a single SAT call.
+
+State files retained: `erdos107/state_6_17_work.json` (32MB)
 
 ## Session Log
 
@@ -76,16 +87,16 @@ Prove ES(6) = 17 via verified SAT: show no 16-point configuration in general pos
 - Lean pivot: added OrderType.Acyclic, SATSpec, CNF spec
 - Proved swap/cycle/acyclic clause soundness
 - Pivoted away from long CEGIS runs to focus on Lean proofs
-- Decision: keep state files, resume CEGIS later if needed
 
-### 2026-01-14
-- STATUS.md updated to reflect actual progress
+### 2026-01-15
+- Proved GPRel soundness, avoidClause soundness, satSpecCNF soundness (no sorry stubs)
+- Added DIMACS emitter and check_unsat.sh
 
 ### 2026-01-20
 - **BREAKTHROUGH:** Corrected CaDiCaL exit code interpretation (20 = UNSAT, not SAT)
-- All signotope scouts (GP3-only, GP3+CC, GP3+CC+full-triangles) confirmed UNSAT
-- Signotope/CC encoding sufficient to refute 17-point "no convex 6-gon" instance
+- Signotope/CC encoding confirmed UNSAT for N=17
 
 ### 2026-01-21
 - LRAT proof generated and verified (cake_lpr: VERIFIED UNSAT)
 - OM3 proof run stopped
+- Artifacts archived
